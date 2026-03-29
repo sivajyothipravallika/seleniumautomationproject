@@ -26,14 +26,14 @@ jobs:
 
     - name: Upload Test logs
       if: always()
-      uses: actions/upload-artifact@v3.2.2
+      uses: actions/upload-artifact@v4
       with:
         name: Test logs
         path: logs/
 
     - name: Upload Test Reports
       if: always()
-      uses: actions/upload-artifact@v3.2.2
+      uses: actions/upload-artifact@v4
       with:
         name: Test Reports
         path: experian_login_test_report.html
