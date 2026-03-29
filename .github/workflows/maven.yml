@@ -39,18 +39,6 @@ jobs:
         name: Test Reports
         path: reports/login_test_report.html
 
-    - name: Debug - List files in workspace
-      if: always()
-      run: |
-        echo "=== Checking reports directory ==="
-        ls -la reports/ || echo "reports/ does not exist"
-   
-        echo "=== Checking screenshots directory ==="
-        ls -la screenshots/ || echo "screenshots/ does not exist"
-        
-        echo "=== Checking entire workspace ==="
-        find . -maxdepth 2 -type f -name "*.html" -o -name "*.png" 2>/dev/null | head -20
-
     # FIX: Properly prepare deployment directory
     - name: Prepare deployment directory
       if: always()
@@ -62,7 +50,7 @@ jobs:
         if [ -d screenshots ]; then
           cp -r screenshots public/extent-reports/
         fi
-        ls -la public/extent-reports/
+        ls -la
 
     # Deploy to GitHub Pages
     - name: Deploy Test Reports to GitHub Pages
