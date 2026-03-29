@@ -20,8 +20,8 @@ public class LambdaTestUtility {
         capabilities.setCapability("browserName", browser);
         capabilities.setCapability("browserVersion", "latest");
         Map<String, Object> ltOptions = new HashMap<>();
-        ltOptions.put("user", "sivajyothipravallika.vurukuti");
-        ltOptions.put("accessKey", "RopIu6TGg7byGwm1Yq98zzpz4zi0W1awDQbyCBXzWozwC6GmIY");
+        ltOptions.put("user", "shivajyothipravallikacse599");
+        ltOptions.put("accessKey", "LT_x6HS0XRxcXIaPvPqlC1S4tR4wXmUCTH9kpJ3Wq8GNN8hCOJ");
         ltOptions.put("build", "Selenium 4");
         ltOptions.put("name", testName);
         ltOptions.put("platformName", "Windows 10");

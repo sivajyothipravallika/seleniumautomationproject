@@ -93,15 +93,6 @@
             <version>5.1.2</version>
             <scope>compile</scope>
         </dependency>
-
-        <!-- SLF4J to Log4j2 bridge (routes SLF4J from OpenCSV/POI through Log4j2) -->
-        <!-- <dependency>
-    <groupId>org.apache.logging.log4j</groupId>
-    <artifactId>log4j-slf4j2-impl</artifactId>
-    <version>2.25.3</version>
-    <scope>compile</scope>
-</dependency> -->
-
     </dependencies>
 
     <build>
@@ -112,18 +103,14 @@
                     <version>3.0.2</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                </plugin>
-                <!-- <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.15.0</version>
                     <configuration>
-                        <suiteXmlFiles>
-                            <suiteXmlFile>testng.xml</suiteXmlFile>
-                        </suiteXmlFiles>
+                        <source>11</source>
+                        <target>11</target>
                     </configuration>
-                </plugin> -->
+                </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
@@ -152,7 +139,7 @@
                         </suiteXmlFiles>
                         <systemPropertyVariables>
                             <browser>chrome</browser>
-                            <isLambdaTest>false</isLambdaTest>
+                            <isLambdaTest>true</isLambdaTest>
                             <isHeadless>false</isHeadless>
                         </systemPropertyVariables>
                     </configuration>
