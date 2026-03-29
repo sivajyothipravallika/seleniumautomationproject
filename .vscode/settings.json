@@ -1,0 +1,14 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.java.home": "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home",
+    "java.debug.settings.javaExec": "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home/bin/java",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-11",
+            "path": "/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home",
+            "default": true
+        }
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
+}
