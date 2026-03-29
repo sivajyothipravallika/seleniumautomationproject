@@ -10,7 +10,6 @@ out/
 logs/
 reports/
 screenshots/
-config/
 *.log
 
 # Build artifacts
