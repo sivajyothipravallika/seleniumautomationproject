@@ -32,6 +32,13 @@ jobs:
         name: Test logs
         path: logs/
 
+    - name: Upload Screenshots as Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: screenshots
+        path: screenshots
+
     - name: Upload Test Reports
       if: always()
       uses: actions/upload-artifact@v4
@@ -39,7 +46,18 @@ jobs:
         name: Test Reports
         path: reports/login_test_report.html
 
-    # FIX: Properly prepare deployment directory
+    - name: Debug - List files in workspace
+      if: always()
+      run: |
+        echo "=== Checking reports directory ==="
+        ls -la reports/ || echo "reports/ does not exist"
+   
+        echo "=== Checking screenshots directory ==="
+        ls -la screenshots/ || echo "screenshots/ does not exist"
+        
+        echo "=== Checking entire workspace ==="
+        find . -maxdepth 2 -type f -name "*.html" -o -name "*.png" 2>/dev/null | head -20
+
     - name: Prepare deployment directory
       if: always()
       run: |
@@ -50,9 +68,8 @@ jobs:
         if [ -d screenshots ]; then
           cp -r screenshots public/extent-reports/
         fi
-        ls -la
+        ls -la public/extent-reports/
 
-    # Deploy to GitHub Pages
     - name: Deploy Test Reports to GitHub Pages
       if: always()
       uses: JamesIves/github-pages-deploy-action@v4
