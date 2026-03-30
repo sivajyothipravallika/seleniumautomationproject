@@ -3,16 +3,14 @@ package com.utility;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -127,12 +125,38 @@ public abstract class BrowserUtility {
         element.sendKeys(text);
     }
 
+    public void enterSpecialKey(By locator, Keys keyToEnter){
+        logger.info("Finding element with the locator "+locator);
+        @SuppressWarnings("null")
+        WebElement element = driver.get().findElement(locator);
+        logger.info("Element found and now enter special key"+keyToEnter);
+        element.sendKeys(keyToEnter);
+    }
+
     @SuppressWarnings("null")
     public String getVisibleText(By locator){
         logger.info("Finding element with the locator "+locator);
         WebElement element = driver.get().findElement(locator);
         logger.info("Element found and now returning the visible text "+element.getText());
         return element.getText();
+    }
+
+    @SuppressWarnings("null")
+    public String getVisibleText(WebElement element) {
+        logger.info("Returning the Visible Text " + element.getText());
+        return element.getText();
+    }
+
+    @SuppressWarnings("null")
+    public List<String> getAllVisibleText(By locator) {
+        logger.info("Finding all elements with the locator " + locator);
+        List<WebElement> elements = driver.get().findElements(locator);
+        logger.info("Elements found and now returning the visible text of all the elements");
+        List<String> visibleTextList = new ArrayList<>();
+        for (WebElement element : elements) {
+                visibleTextList.add(getVisibleText(element));
+            }
+        return visibleTextList;
     }
 
     public String takeScreenShot(String name) {
