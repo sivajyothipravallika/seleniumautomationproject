@@ -1,7 +1,7 @@
 name: Test Automation Workflow
 
 on:
-  schedule:
+  #schedule:
     # - cron: 00 18 * * *
   push:
     branches: [ "main" ]
