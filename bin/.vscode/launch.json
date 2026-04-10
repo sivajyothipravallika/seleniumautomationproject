@@ -1,6 +1,5 @@
 {
     "configurations": [
-        
         {
             "type": "java",
             "name": "Run TestNG Suite",
@@ -8,8 +7,7 @@
             "mainClass": "org.testng.TestNG",
             "projectName": "assignment",
             "args": "${workspaceFolder}/testng.xml",
-            "cwd": "${workspaceFolder}",
-            "vmArgs": "-Dheadless=false"
+            "cwd": "${workspaceFolder}"
         },
         {
             "type": "msedge",

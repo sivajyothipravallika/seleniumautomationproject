@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 public class SearchProductTest extends TestBase{
 
     private MyAccountPage myAccountPage;
-    private static final String SEARCH_KEYWORD = "Printed Summer Dress";
+    private static final String SEARCH_KEYWORD = "Mens Wallet";
 
     @BeforeMethod(description = "valid user logs into the application")
     public void setup(){
@@ -21,6 +21,6 @@ public class SearchProductTest extends TestBase{
             groups = {"e2e", "smoke", "sanity"})
     public void verifySearchProduct(){
         boolean actualResult = myAccountPage.searchProduct(SEARCH_KEYWORD).isSearchTermPresentInProductList(SEARCH_KEYWORD);
-        Assert.assertEquals(actualResult, "true");
+        Assert.assertEquals(actualResult, true);
     }
 }

@@ -3,6 +3,7 @@ package com.utility;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,9 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.constants.Browser;
 
@@ -110,19 +114,27 @@ public abstract class BrowserUtility {
     }
 
     public void clickOn(By locator){
-        logger.info("Finding element with the locator "+locator);
-        @SuppressWarnings("null")
-        WebElement element = driver.get().findElement(locator);
-        logger.info("Element found and now performing click "+locator);
+        logger.info("Waiting for element to become clickable: "+locator);
+        WebDriverWait wait = new WebDriverWait(driver.get(), Duration.ofSeconds(15));
+        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+        logger.info("Element is clickable and now performing click: "+locator);
         element.click();
     }
 
     public void enterText(By locator, String text){
-        logger.info("Finding element with the locator "+locator);
-        @SuppressWarnings("null")
-        WebElement element = driver.get().findElement(locator);
-        logger.info("Element found and now enter text "+text);
+        logger.info("Waiting for element to be visible: "+locator);
+        WebDriverWait wait = new WebDriverWait(driver.get(), Duration.ofSeconds(15));
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        logger.info("Element is visible and now entering text: "+text);
         element.sendKeys(text);
+    }
+
+    public void clearText(By textBoxLocator){
+        logger.info("Waiting for element to be visible: "+textBoxLocator);
+        WebDriverWait wait = new WebDriverWait(driver.get(), Duration.ofSeconds(15));
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(textBoxLocator));
+        logger.info("Element is visible and now clearing the text box field");
+        element.clear();
     }
 
     public void enterSpecialKey(By locator, Keys keyToEnter){
@@ -145,6 +157,116 @@ public abstract class BrowserUtility {
     public String getVisibleText(WebElement element) {
         logger.info("Returning the Visible Text " + element.getText());
         return element.getText();
+    }
+
+    @SuppressWarnings("null")
+    public void selectFromDropdown(By dropdownLocator, String optionToSelect){
+        logger.info("Waiting for dropdown to be present: "+dropdownLocator);
+        // WebElement element = driver.get().findElement(dropdownLocator);
+        // Select select = new Select(element);
+        // logger.info("Selecting the option "+optionToSelect);
+        // select.selectByVisibleText(optionToSelect);
+        WebDriverWait wait = new WebDriverWait(driver.get(), Duration.ofSeconds(30));
+        WebElement element;
+        try {
+            element = wait.until(ExpectedConditions.presenceOfElementLocated(dropdownLocator));
+        } catch (TimeoutException e) {
+            logger.warn("Dropdown not found with locator " + dropdownLocator + ". Trying fallback selectors.");
+            element = findFallbackSelect("state");
+        }
+        scrollToElement(element);
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(element));
+        } catch (TimeoutException ex) {
+            logger.warn("Dropdown element not clickable after wait; continuing with selection.");
+        }
+        Select select = new Select(element);
+        logger.info("Selecting dropdown option by visible text first: "+ optionToSelect);
+        try {
+            select.selectByVisibleText(optionToSelect);
+        } catch (NoSuchElementException e) {
+            logger.warn("Option not found by visible text, trying by value: " + optionToSelect);
+            select.selectByValue(optionToSelect);
+        }
+    }
+
+    @SuppressWarnings("null")
+    public void selectFromDropdownWhenOptionAvailable(By dropdownLocator, String optionToSelect) {
+        logger.info("Waiting for dropdown to be present: " + dropdownLocator);
+        WebDriverWait wait = new WebDriverWait(driver.get(), Duration.ofSeconds(30));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(dropdownLocator));
+        scrollToElement(element);
+
+        logger.info("Waiting for dropdown option to become available: " + optionToSelect);
+        wait.until(driver -> {
+            WebElement currentElement = driver.findElement(dropdownLocator);
+            Select select = new Select(currentElement);
+            return select.getOptions().size() > 1 || hasOption(select, optionToSelect);
+        });
+
+        WebElement currentElement = driver.get().findElement(dropdownLocator);
+        Select select = new Select(currentElement);
+        wait.until(driver -> hasOption(select, optionToSelect));
+
+        if (currentElement.isDisplayed()) {
+            select.selectByVisibleText(optionToSelect);
+            wait.until(driver -> optionToSelect.equals(select.getFirstSelectedOption().getText().trim()));
+        } else {
+            selectHiddenDropdownOption(currentElement, optionToSelect);
+            wait.until(driver -> {
+                Select refreshedSelect = new Select(driver.findElement(dropdownLocator));
+                return optionToSelect.equals(refreshedSelect.getFirstSelectedOption().getText().trim());
+            });
+        }
+
+        logger.info("Selected dropdown option: " + optionToSelect);
+    }
+
+    private WebElement findFallbackSelect(String keyword) {
+        @SuppressWarnings("null")
+        List<By> fallbackLocators = List.of(
+            By.cssSelector("select[id*='" + keyword + "']"),
+            By.cssSelector("select[name*='" + keyword + "']"),
+            By.xpath("//label[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + keyword + "')]/following::select[1]"),
+            By.xpath("//select[contains(@id, '" + keyword + "') or contains(@name, '" + keyword + "')]")
+        );
+        for (By locator : fallbackLocators) {
+            List<WebElement> candidates = driver.get().findElements(locator);
+            if (!candidates.isEmpty()) {
+                logger.info("Found dropdown using fallback locator: " + locator);
+                return candidates.get(0);
+            }
+        }
+        throw new NoSuchElementException("Unable to locate dropdown with locator or fallback selectors for keyword: " + keyword);
+    }
+
+    private void scrollToElement(WebElement element) {
+        try {
+            ((JavascriptExecutor) driver.get()).executeScript("arguments[0].scrollIntoView({behavior:'auto', block:'center', inline:'nearest'});", element);
+        } catch (Exception e) {
+            logger.warn("Unable to scroll to dropdown element: " + e.getMessage());
+        }
+    }
+
+    private boolean hasOption(Select select, String optionToSelect) {
+        return select.getOptions().stream()
+            .anyMatch(option -> optionToSelect.equals(option.getText().trim()));
+    }
+
+    private void selectHiddenDropdownOption(WebElement element, String optionToSelect) {
+        Select select = new Select(element);
+        String optionValue = select.getOptions().stream()
+            .filter(option -> optionToSelect.equals(option.getText().trim()))
+            .map(option -> option.getAttribute("value"))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Unable to find option with text: " + optionToSelect));
+
+        ((JavascriptExecutor) driver.get()).executeScript(
+            "arguments[0].value = arguments[1];" +
+            "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
+            element,
+            optionValue
+        );
     }
 
     @SuppressWarnings("null")
